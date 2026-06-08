@@ -37,8 +37,8 @@ Replace `YOUR-USERNAME` with your GitHub username.
 
 ```text
 orthopedic-stretch-library/
-‚îú‚îÄ‚îÄ index.html
-‚îî‚îÄ‚îÄ README.md
+├── index.html
+└── README.md
 ```
 
 - `index.html` contains the full website, styling, stretch data, filters, and interactive features.

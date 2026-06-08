@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Move Better: an educational orthopedic stretch library with searchable, filterable movement cards and safety guidance.">
+  <title>Move Better | Orthopedic Stretch Library</title>
+  <style>
+    :root {
+      --ink:#20312d; --muted:#64736f; --paper:#f7f8f5; --card:#fff;
+      --sage:#7d9b8f; --sage-dark:#46685b; --sage-soft:#e3ece7;
+      --sand:#eee6d8; --warning:#fff4df; --line:#dce4df;
+      --shadow:0 16px 40px rgba(38,63,54,.09); --radius:20px;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink);line-height:1.6}
+    button,input,select{font:inherit} a{color:var(--sage-dark)}
+    a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #b9d4c8;outline-offset:3px}
+    .hero{position:relative;overflow:hidden;background:radial-gradient(circle at 85% 20%,rgba(255,255,255,.35),transparent 22rem),linear-gradient(135deg,#385d50,#7d9b8f);color:white;padding:72px 22px 80px}
+    .hero:after{content:"";position:absolute;inset:auto -5% -65px -5%;height:130px;border-radius:50% 50% 0 0;background:var(--paper)}
+    .hero-inner{width:min(1120px,100%);margin:auto;position:relative;z-index:1;display:grid;grid-template-columns:1.35fr .65fr;gap:40px;align-items:center}
+    .eyebrow{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:.78rem;opacity:.85}
+    h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.8rem,7vw,5.8rem);line-height:.96;margin:14px 0 20px;max-width:760px}
+    .hero p{font-size:clamp(1rem,2vw,1.2rem);max-width:700px;opacity:.94}
+    .hero-art{width:100%;min-height:280px;display:grid;place-items:center}
+    .figure{width:240px;height:240px;border:2px solid rgba(255,255,255,.65);border-radius:50%;display:grid;place-items:center;font-size:7rem;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 20px rgba(255,255,255,.04)}
+    main{width:min(1120px,calc(100% - 32px));margin:0 auto 80px}
+    .safety{display:grid;grid-template-columns:auto 1fr;gap:18px;padding:24px;border-radius:var(--radius);background:var(--warning);border:1px solid #ead6ae;margin:10px 0 38px;box-shadow:var(--shadow)}
+    .safety-icon{font-size:2rem} .safety h2{margin:0 0 6px;font-size:1.18rem} .safety p{margin:0}
+    .controls{position:sticky;top:12px;z-index:10;background:rgba(247,248,245,.94);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 30px rgba(31,50,44,.08);padding:16px;margin-bottom:28px}
+    .control-row{display:grid;grid-template-columns:minmax(220px,1fr) 220px 220px auto;gap:12px}
+    .control{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:white;color:var(--ink)}
+    .clear-btn{border:0;border-radius:12px;padding:12px 17px;background:var(--sage-dark);color:white;font-weight:800;cursor:pointer}
+    .result-count{margin:10px 2px 0;color:var(--muted);font-size:.92rem}
+    .region-nav{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 30px}
+    .region-chip{border:1px solid var(--line);background:white;border-radius:999px;padding:9px 14px;cursor:pointer;color:var(--ink)}
+    .region-chip:hover,.region-chip.active{background:var(--sage-soft);border-color:#9bb8ac}
+    .section-heading{display:flex;align-items:end;justify-content:space-between;gap:20px;margin:36px 0 18px}
+    .section-heading h2{font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.9rem,4vw,2.8rem);margin:0}
+    .section-heading p{margin:0;color:var(--muted);max-width:620px}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+    .stretch-card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 24px rgba(38,63,54,.06);transition:transform .18s ease,box-shadow .18s ease}
+    .stretch-card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+    .card-visual{min-height:135px;padding:20px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,var(--sage-soft),#f4efe6)}
+    .visual-icon{font-size:3.7rem} .region-label{align-self:flex-start;background:rgba(255,255,255,.75);padding:6px 10px;border-radius:999px;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    .card-body{padding:20px;display:flex;flex-direction:column;flex:1} .card-body h3{margin:0 0 4px;font-size:1.25rem;line-height:1.3}
+    .best-for{color:var(--sage-dark);font-weight:700;margin:0 0 14px}
+    .tag-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px} .tag{font-size:.78rem;padding:4px 9px;border-radius:999px;background:var(--sand)}
+    .details{border-top:1px solid var(--line);margin-top:auto;padding-top:14px} details summary{cursor:pointer;font-weight:800;color:var(--sage-dark)} details[open] summary{margin-bottom:10px}
+    .instructions{padding-left:20px;margin:8px 0 12px} .facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+    .fact{padding:10px;border-radius:10px;background:#f5f7f5;font-size:.88rem} .fact strong{display:block}
+    .caution{margin-top:12px;padding:11px 12px;border-left:4px solid #bd776e;background:#fff4f2;font-size:.9rem}
+    .empty{display:none;text-align:center;padding:50px 20px;border:1px dashed #aebdb7;border-radius:var(--radius);background:white}
+    .red-flags,.sources{margin-top:52px;border-radius:var(--radius);padding:28px} .red-flags{background:#f6e9e7;border:1px solid #e5c7c2} .sources{background:white;border:1px solid var(--line)}
+    .red-flags h2,.sources h2{margin-top:0;font-family:Georgia,"Times New Roman",serif} .red-flags ul{columns:2;gap:34px} .source-list{display:grid;gap:10px;padding-left:20px}
+    footer{text-align:center;padding:34px 20px;background:#263e36;color:rgba(255,255,255,.8)} .hidden{display:none!important}
+    @media(max-width:900px){.hero-inner{grid-template-columns:1fr}.hero-art{display:none}.control-row{grid-template-columns:1fr 1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:620px){.hero{padding-top:52px}.control-row{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.section-heading{align-items:start;flex-direction:column}.red-flags ul{columns:1}.safety{grid-template-columns:1fr}.controls{top:6px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="eyebrow">Educational movement guide</div>
+        <h1>Move Better.</h1>
+        <p>Explore gentle stretches and mobility exercises for common areas of muscle tightness and orthopedic discomfort. Search, filter, and move at your own pace.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true"><div class="figure">🧘</div></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="safety" aria-labelledby="safety-title">
+      <div class="safety-icon" aria-hidden="true">⚠️</div>
+      <div>
+        <h2 id="safety-title">Read before you begin</h2>
+        <p>This library is for general education, not diagnosis or individualized treatment. Move gently and stay within a comfortable range. Stop if a movement causes sharp pain, worsening pain traveling into an arm or leg, numbness, tingling, weakness, dizziness, or loss of balance. Ask a qualified healthcare professional which exercises are appropriate after surgery, trauma, or a new diagnosis.</p>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="Stretch filters">
+      <div class="control-row">
+        <input id="searchInput" class="control" type="search" placeholder="Search a stretch, muscle, or symptom…" aria-label="Search stretches">
+        <select id="regionFilter" class="control" aria-label="Filter by body region">
+          <option value="all">All body regions</option>
+          <option value="neck">Neck</option>
+          <option value="shoulder">Shoulder</option>
+          <option value="low-back">Low back</option>
+          <option value="radiating-pain">Pain with radiation</option>
+          <option value="hip">Hip</option>
+          <option value="knee">Knee</option>
+        </select>
+        <select id="positionFilter" class="control" aria-label="Filter by position">
+          <option value="all">Any position</option>
+          <option value="seated">Seated</option>
+          <option value="standing">Standing</option>
+          <option value="lying">Lying down</option>
+          <option value="kneeling">Kneeling</option>
+        </select>
+        <button id="clearFilters" class="clear-btn" type="button">Reset</button>
+      </div>
+      <div id="resultCount" class="result-count" aria-live="polite"></div>
+    </section>
+
+    <nav class="region-nav" aria-label="Quick body region filters">
+      <button class="region-chip active" data-region="all">All</button>
+      <button class="region-chip" data-region="neck">Neck</button>
+      <button class="region-chip" data-region="shoulder">Shoulder</button>
+      <button class="region-chip" data-region="low-back">Low back</button>
+      <button class="region-chip" data-region="radiating-pain">Pain With Radiation</button>
+      <button class="region-chip" data-region="hip">Hip</button>
+      <button class="region-chip" data-region="knee">Knee</button>
+    </nav>
+
+    <div class="section-heading">
+      <div><div class="eyebrow" style="color:var(--sage-dark)">Stretch library</div><h2>Choose a comfortable starting point</h2></div>
+      <p>These movements are deliberately simple. More aggressive is not more effective; the goal is controlled motion without symptom escalation.</p>
+    </div>
+
+    <section id="stretchGrid" class="grid" aria-label="Stretch cards"></section>
+    <div id="emptyState" class="empty"><h2>No stretches match those filters.</h2><p>Try another body region, position, or search term.</p></div>
+
+    <section class="red-flags">
+      <h2>Stop and seek medical care</h2>
+      <p>Do not rely on a stretch library when symptoms may indicate a serious injury or neurological problem. Seek urgent or emergency care as appropriate for:</p>
+      <ul>
+        <li>Loss of bladder or bowel control</li>
+        <li>Numbness in the groin or saddle area</li>
+        <li>New or progressive limb weakness</li>
+        <li>Chest pain or trouble breathing</li>
+        <li>Severe pain after a fall, collision, or other trauma</li>
+        <li>Fever with severe neck or back pain</li>
+        <li>A hot, red, markedly swollen joint</li>
+        <li>Inability to bear weight or use the limb</li>
+      </ul>
+    </section>
+
+    <section class="sources">
+      <h2>Clinical education sources</h2>
+      <p>The movement selections and safety framing were adapted for general education from reputable orthopedic and public-health resources. Individual instructions may need modification by a physician or physical therapist.</p>
+      <ul class="source-list">
+        <li><a href="https://orthoinfo.aaos.org/en/recovery/spine-conditioning-program/" target="_blank" rel="noopener">American Academy of Orthopaedic Surgeons — Spine Conditioning Program</a></li>
+        <li><a href="https://orthoinfo.aaos.org/en/recovery/shoulder-conditioning-program/" target="_blank" rel="noopener">American Academy of Orthopaedic Surgeons — Shoulder Conditioning Program</a></li>
+        <li><a href="https://orthoinfo.aaos.org/en/recovery/hip-conditioning-program/" target="_blank" rel="noopener">American Academy of Orthopaedic Surgeons — Hip Conditioning Program</a></li>
+        <li><a href="https://orthoinfo.aaos.org/en/recovery/knee-conditioning-program/" target="_blank" rel="noopener">American Academy of Orthopaedic Surgeons — Knee Conditioning Program</a></li>
+        <li><a href="https://medlineplus.gov/backpain.html" target="_blank" rel="noopener">MedlinePlus — Back Pain</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer><strong>Move Better Orthopedic Stretch Library</strong><br>Educational use only · Not a substitute for professional medical care</footer>
+
+  <script>
+    const stretches = [{"name": "Upper Trapezius Stretch", "region": "neck", "regionLabel": "Neck", "position": "seated", "icon": "🙆", "bestFor": "Upper neck and shoulder tension", "tags": ["Beginner", "No equipment", "Desk-friendly"], "targets": "Upper trapezius and lateral neck", "hold": "20–30 seconds", "repeat": "2–3 each side", "steps": ["Sit tall with both feet supported and shoulders relaxed.", "Tilt one ear gently toward the same-side shoulder.", "Keep the opposite shoulder down and avoid turning the head.", "Use your hand only for light guidance, not force."], "caution": "Stop if this causes dizziness, arm tingling, numbness, weakness, or sharp pain."}, {"name": "Levator Scapulae Stretch", "region": "neck", "regionLabel": "Neck", "position": "seated", "icon": "🪑", "bestFor": "Tightness from the upper shoulder blade to the neck", "tags": ["Beginner", "No equipment"], "targets": "Levator scapulae", "hold": "20–30 seconds", "repeat": "2–3 each side", "steps": ["Sit upright and turn your head about 45 degrees to one side.", "Look down toward the front pocket on that side.", "Use the hand only for gentle guidance.", "Keep the opposite shoulder relaxed."], "caution": "Do not pull forcefully or continue if symptoms spread into the arm."}, {"name": "Chin Tuck", "region": "neck", "regionLabel": "Neck", "position": "seated", "icon": "🧍", "bestFor": "Forward-head posture and gentle neck control", "tags": ["Mobility", "Desk-friendly", "No equipment"], "targets": "Deep neck flexors and cervical posture", "hold": "3–5 seconds", "repeat": "8–10 repetitions", "steps": ["Sit or stand tall while looking straight ahead.", "Draw your chin straight backward as if making a small double chin.", "Keep the head level rather than looking down.", "Relax fully between repetitions."], "caution": "Use a small range. Stop if it increases headache, dizziness, or radiating symptoms."}, {"name": "Cross-Body Shoulder Stretch", "region": "shoulder", "regionLabel": "Shoulder", "position": "standing", "icon": "🤸", "bestFor": "Back-of-shoulder tightness", "tags": ["Beginner", "No equipment"], "targets": "Posterior deltoid and shoulder capsule", "hold": "20–30 seconds", "repeat": "2–3 each side", "steps": ["Bring one arm across your chest at shoulder height.", "Use the opposite forearm to support it above the elbow.", "Keep the shoulder down and away from the ear.", "Gently draw the arm closer until a mild stretch is felt."], "caution": "Avoid forcing the arm across the body after a recent shoulder injury or surgery."}, {"name": "Doorway Chest Stretch", "region": "shoulder", "regionLabel": "Shoulder", "position": "standing", "icon": "🚪", "bestFor": "Chest tightness and rounded shoulders", "tags": ["Beginner", "Doorway"], "targets": "Pectoralis major and minor", "hold": "20–30 seconds", "repeat": "2–3 times", "steps": ["Place your forearms on the sides of a doorway.", "Keep the elbows slightly below shoulder height.", "Step forward slowly while keeping the ribs relaxed.", "Stop when a gentle stretch is felt across the chest."], "caution": "Lower the arms if the shoulder pinches. Stop for chest pain or arm numbness."}, {"name": "Pendulum Exercise", "region": "shoulder", "regionLabel": "Shoulder", "position": "standing", "icon": "🌀", "bestFor": "Gentle shoulder motion when active movement is uncomfortable", "tags": ["Gentle", "Support needed"], "targets": "Shoulder joint mobility", "hold": "30–60 seconds", "repeat": "2–3 rounds", "steps": ["Support yourself with one hand on a table or chair.", "Lean forward slightly and let the other arm hang relaxed.", "Shift your body gently to create small circles with the hanging arm.", "Reverse direction after several circles."], "caution": "The arm should stay relaxed. Do not make large or forceful circles."}, {"name": "Single Knee-to-Chest", "region": "low-back", "regionLabel": "Low Back", "position": "lying", "icon": "🛏️", "bestFor": "Gentle low-back and hip mobility", "tags": ["Beginner", "Floor"], "targets": "Low back and gluteal region", "hold": "20–30 seconds", "repeat": "2–3 each side", "steps": ["Lie on your back with both knees bent.", "Bring one knee toward your chest.", "Hold behind the thigh or over the shin without forcing.", "Keep the other foot supported and shoulders relaxed."], "caution": "Stop if leg pain travels farther down the limb or neurological symptoms increase."}, {"name": "Lower Trunk Rotation", "region": "low-back", "regionLabel": "Low Back", "position": "lying", "icon": "↔️", "bestFor": "Gentle spinal and hip rotation", "tags": ["Mobility", "Floor"], "targets": "Lumbar region and trunk muscles", "hold": "5–10 seconds", "repeat": "8–10 total", "steps": ["Lie on your back with knees bent and feet together.", "Keep your shoulders resting on the floor.", "Let both knees move slowly toward one side.", "Return to center and repeat on the other side."], "caution": "Keep the motion small and comfortable. Avoid after recent spinal surgery unless cleared."}, {"name": "Cat–Cow Mobility", "region": "low-back", "regionLabel": "Low Back", "position": "kneeling", "icon": "🐈", "bestFor": "Gentle movement through the spine", "tags": ["Mobility", "Floor", "No equipment"], "targets": "Spine and trunk", "hold": "Move slowly", "repeat": "8–10 cycles", "steps": ["Begin on hands and knees with a neutral spine.", "Slowly round your back while allowing the head to relax.", "Then gently lift the chest and tailbone without collapsing the low back.", "Move smoothly between the two positions."], "caution": "Use padding under the knees and avoid forcing the neck or low back."}, {"name": "Supine Figure-Four Stretch", "region": "radiating-pain", "regionLabel": "Pain With Radiation", "position": "lying", "icon": "4️⃣", "bestFor": "Buttock tightness when symptoms do not worsen down the leg", "tags": ["Gentle", "Floor", "No equipment"], "targets": "Gluteal and deep hip muscles", "hold": "20–30 seconds", "repeat": "2 each side", "steps": ["Lie on your back with both knees bent.", "Cross one ankle over the opposite thigh.", "Hold behind the uncrossed thigh and draw it toward you gently.", "Keep the head and shoulders relaxed."], "caution": "Do not continue if pain travels farther down the leg, or numbness, tingling, or weakness increases."}, {"name": "Gentle Nerve Slider", "region": "radiating-pain", "regionLabel": "Pain With Radiation", "position": "seated", "icon": "🦵", "bestFor": "Carefully moving a sensitive nerve without holding a stretch", "tags": ["Mobility", "Seated", "Advanced caution"], "targets": "Neural mobility of the leg", "hold": "No sustained hold", "repeat": "5–8 gentle repetitions", "steps": ["Sit tall near the front of a firm chair.", "Slowly straighten one knee while lifting your gaze slightly.", "Bend the knee again while gently lowering your chin.", "Move smoothly and stay well below the point of symptom aggravation."], "caution": "This is a slider, not a strong stretch. Stop if symptoms intensify or remain worse afterward."}, {"name": "Prone on Elbows", "region": "radiating-pain", "regionLabel": "Pain With Radiation", "position": "lying", "icon": "⬆️", "bestFor": "Some patterns of back pain that travel into the leg", "tags": ["Gentle", "Floor", "Symptom-guided"], "targets": "Lumbar extension mobility", "hold": "10–20 seconds", "repeat": "5 repetitions", "steps": ["Lie on your stomach with your forearms under your shoulders.", "Gently lift your chest while keeping the pelvis relaxed on the floor.", "Breathe normally and avoid pushing into sharp pain.", "Return to lying flat between repetitions."], "caution": "Only continue if leg symptoms stay the same or move closer to the back. Stop if they travel farther down the leg."}, {"name": "Half-Kneeling Hip Flexor Stretch", "region": "hip", "regionLabel": "Hip", "position": "kneeling", "icon": "🧎", "bestFor": "Front-of-hip tightness", "tags": ["Beginner", "Floor"], "targets": "Hip flexors", "hold": "20–30 seconds", "repeat": "2–3 each side", "steps": ["Kneel on one knee with the other foot in front.", "Gently tuck the pelvis as though bringing the belt buckle upward.", "Shift forward slightly while keeping the trunk upright.", "Feel the stretch at the front of the kneeling-side hip."], "caution": "Use padding under the knee and avoid arching the low back."}, {"name": "Seated Figure-Four Stretch", "region": "hip", "regionLabel": "Hip", "position": "seated", "icon": "🪑", "bestFor": "Gluteal and outer-hip tightness", "tags": ["Desk-friendly", "No equipment"], "targets": "Gluteal and deep hip muscles", "hold": "20–30 seconds", "repeat": "2–3 each side", "steps": ["Sit tall in a stable chair.", "Place one ankle over the opposite thigh.", "Keep the back long and hinge forward slightly from the hips.", "Stop when a mild stretch is felt in the buttock."], "caution": "Do not press the knee downward. Stop if pain radiates or neurological symptoms appear."}, {"name": "Standing Adductor Stretch", "region": "hip", "regionLabel": "Hip", "position": "standing", "icon": "↙️", "bestFor": "Inner-thigh and groin tightness", "tags": ["Standing", "No equipment"], "targets": "Hip adductors", "hold": "20–30 seconds", "repeat": "2 each side", "steps": ["Stand with the feet wider than hip width.", "Shift your weight toward one side while bending that knee.", "Keep the opposite leg straight and both feet facing forward.", "Stop when a mild stretch is felt along the inner thigh."], "caution": "Hold a stable surface if balance is limited. Avoid forcing into groin pain."}, {"name": "Standing Quadriceps Stretch", "region": "knee", "regionLabel": "Knee", "position": "standing", "icon": "🦿", "bestFor": "Front-of-thigh tightness", "tags": ["Standing", "Support recommended"], "targets": "Quadriceps", "hold": "20–30 seconds", "repeat": "2–3 each side", "steps": ["Hold a stable surface for balance.", "Bend one knee and bring the heel toward the buttock.", "Hold the ankle or pant leg without pulling hard.", "Keep the knees close together and the trunk upright."], "caution": "Avoid if deep knee bending is restricted or painful. Do not twist the knee."}, {"name": "Standing Calf Stretch", "region": "knee", "regionLabel": "Knee", "position": "standing", "icon": "🧱", "bestFor": "Calf tightness affecting lower-limb mobility", "tags": ["Beginner", "Wall"], "targets": "Gastrocnemius and calf", "hold": "20–30 seconds", "repeat": "2–3 each side", "steps": ["Face a wall and place both hands on it.", "Step one foot backward and keep that heel down.", "Keep the back knee straight and toes pointing forward.", "Lean forward until a gentle calf stretch is felt."], "caution": "Stop for sudden calf swelling, heat, redness, or unexplained severe pain."}, {"name": "Supine Hamstring Stretch", "region": "knee", "regionLabel": "Knee", "position": "lying", "icon": "🧘", "bestFor": "Back-of-thigh tightness", "tags": ["Floor", "Strap optional"], "targets": "Hamstrings", "hold": "20–30 seconds", "repeat": "2–3 each side", "steps": ["Lie on your back with one knee bent.", "Lift the other thigh and support it behind the leg.", "Slowly straighten the raised knee until a mild stretch is felt.", "Keep the low back and shoulders relaxed."], "caution": "A mild muscular stretch is acceptable; radiating pain, tingling, or numbness is not."}];
+
+    const grid = document.getElementById("stretchGrid");
+    const searchInput = document.getElementById("searchInput");
+    const regionFilter = document.getElementById("regionFilter");
+    const positionFilter = document.getElementById("positionFilter");
+    const resultCount = document.getElementById("resultCount");
+    const emptyState = document.getElementById("emptyState");
+    const clearFilters = document.getElementById("clearFilters");
+    const chips = [...document.querySelectorAll(".region-chip")];
+
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]));
+    }
+
+    function cardTemplate(item) {
+      return `
+        <article class="stretch-card">
+          <div class="card-visual">
+            <div class="visual-icon" aria-hidden="true">${escapeHTML(item.icon)}</div>
+            <div class="region-label">${escapeHTML(item.regionLabel)}</div>
+          </div>
+          <div class="card-body">
+            <h3>${escapeHTML(item.name)}</h3>
+            <p class="best-for">${escapeHTML(item.bestFor)}</p>
+            <div class="tag-row">${item.tags.map(tag => `<span class="tag">${escapeHTML(tag)}</span>`).join("")}</div>
+            <div class="details">
+              <details>
+                <summary>View instructions</summary>
+                <ol class="instructions">${item.steps.map(step => `<li>${escapeHTML(step)}</li>`).join("")}</ol>
+                <div class="facts">
+                  <div class="fact"><strong>Hold</strong>${escapeHTML(item.hold)}</div>
+                  <div class="fact"><strong>Repeat</strong>${escapeHTML(item.repeat)}</div>
+                </div>
+                <div class="fact"><strong>Targets</strong>${escapeHTML(item.targets)}</div>
+                <div class="caution"><strong>Use caution:</strong> ${escapeHTML(item.caution)}</div>
+              </details>
+            </div>
+          </div>
+        </article>`;
+    }
+
+    function render() {
+      const query = searchInput.value.trim().toLowerCase();
+      const region = regionFilter.value;
+      const position = positionFilter.value;
+
+      const filtered = stretches.filter(item => {
+        const searchable = [
+          item.name, item.regionLabel, item.bestFor, item.targets,
+          item.position, ...item.tags, ...item.steps
+        ].join(" ").toLowerCase();
+
+        return (region === "all" || item.region === region)
+          && (position === "all" || item.position === position)
+          && (!query || searchable.includes(query));
+      });
+
+      grid.innerHTML = filtered.map(cardTemplate).join("");
+      resultCount.textContent = `${filtered.length} of ${stretches.length} movements shown`;
+      emptyState.style.display = filtered.length ? "none" : "block";
+      grid.style.display = filtered.length ? "grid" : "none";
+
+      chips.forEach(chip => chip.classList.toggle("active", chip.dataset.region === region));
+    }
+
+    [searchInput, regionFilter, positionFilter].forEach(control => control.addEventListener("input", render));
+
+    chips.forEach(chip => chip.addEventListener("click", () => {
+      regionFilter.value = chip.dataset.region;
+      render();
+    }));
+
+    clearFilters.addEventListener("click", () => {
+      searchInput.value = "";
+      regionFilter.value = "all";
+      positionFilter.value = "all";
+      render();
+      searchInput.focus();
+    });
+
+    render();
+  </script>
+</body>
+</html>
